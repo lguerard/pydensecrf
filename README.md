@@ -1,17 +1,32 @@
 PyDenseCRF2
 ==========
 
-NOTE: this code is forked from `https://github.com/lucasb-eyer/pydensecrf`, which is not actively maintained. However, this is a highly useful dependency for our work, [CellSeg3D](https://github.com/AdaptiveMotorControlLab/CellSeg3), thus we am maintaing the package for `pypi` here!
+NOTE: this code is forked from `https://github.com/lucasb-eyer/pydensecrf`, which is not actively maintained. However, this is a highly useful dependency for our work, [CellSeg3D](https://github.com/AdaptiveMotorControlLab/CellSeg3), thus we are maintaing the package for `pypi` here!
 
 
-Quick start:
+## Quick start:
 
 ```
 pip install pydensecrf2
 import pydensecrf
 ```
 
-### Original Readme:
+Then use the package as desribed below!
+
+## Please credit the original authors by citing:
+
+```
+@article{Krhenbhl2011EfficientII,
+  title={Efficient Inference in Fully Connected CRFs with Gaussian Edge Potentials},
+  author={Philipp Kr{\"a}henb{\"u}hl and Vladlen Koltun},
+  journal={Neural Information Processing Systems (NeurIPS)},
+  year={2011},
+}
+```
+
+
+
+## Original Readme ([link](https://github.com/lucasb-eyer/pydensecrf))
 ----------
 
 This is a (Cython-based) Python wrapper for [Philipp Krähenbühl's Fully-Connected CRFs](http://web.archive.org/web/20161023180357/http://www.philkr.net/home/densecrf) (version 2, [new, incomplete page](http://www.philkr.net/2011/12/01/nips/)).
