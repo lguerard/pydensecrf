@@ -89,7 +89,7 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.TWINE_API_KEY }}
         run: |
           # Build the package with cibuildwheel for compatibility with manylinux
-          cibuildwheel --output-dir dist
+          cibuildwheel --output-dir dist --python "cp38,cp39"
   
           # Upload to PyPI using Twine
           twine upload dist/*
