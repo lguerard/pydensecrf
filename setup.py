@@ -1,5 +1,6 @@
 # coding: UTF-8
 from setuptools import setup
+from pathlib import Path
 
 # TODO:
 # - Wrap learning.
@@ -20,9 +21,9 @@ except ImportError:
 
 setup(
     name="pydensecrf2",
-    version="1.1rc1",
+    version="1.1",
     description="A python interface to Philipp Krähenbühl's fully-connected (dense) CRF code.",
-    long_description="See the README.md at http://github.com/lucasb-eyer/pydensecrf",
+    long_description=(Path(__file__).parent / "README.md").read_text(),
     author="Lucas Beyer, Philipp Krähenbühl",
     author_email="lucasb.eyer.be@gmail.com",
     maintainer="Mackenzie Mathis",  
