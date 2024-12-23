@@ -1,4 +1,4 @@
-# This workflows will upload a Python Package using Twine when a release is created
+# This workflow will upload a Python Package using Twine when a release is created
 # For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
 
 name: test and deploy
@@ -8,7 +8,7 @@ on:
     branches:
       - main
     tags:
-      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+      - "v*"  # Push events to matching v*, i.e., v1.0, v20.15.10
   pull_request:
     branches:
       - main
@@ -20,9 +20,8 @@ jobs:
     runs-on: ${{ matrix.platform }}
     strategy:
       matrix:
-# platform: [ubuntu-latest, windows-latest] # , macos-latest
         platform: [ubuntu-latest]
-        python-version: ['3.8', '3.9'] #issues with monai and 3.10; pausing for now. users should use python 3.9
+        python-version: ['3.8', '3.9']  # Issues with monai and 3.10; pausing for now. Users should use Python 3.9.
 
     steps:
       - uses: actions/checkout@v3
@@ -32,10 +31,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-# these libraries enable testing on Qt on linux
+      # These libraries enable testing on Qt on Linux
       - uses: tlambert03/setup-qt-libs@v1
 
-# strategy borrowed from vispy for installing opengl libs on windows
+      # Strategy borrowed from vispy for installing OpenGL libs on Windows
       - name: Install Windows OpenGL
         if: runner.os == 'Windows'
         run: |
@@ -43,19 +42,18 @@ jobs:
           powershell gl-ci-helpers/appveyor/install_opengl.ps1
           if (Test-Path -Path "C:\Windows\system32\opengl32.dll" -PathType Leaf) {Exit 0} else {Exit 1}
 
-# note: if you need dependencies from conda, considering using
-# setup-miniconda: https://github.com/conda-incubator/setup-miniconda
-# and
-# tox-conda: https://github.com/tox-dev/tox-conda
+      # If you need dependencies from Conda, consider using:
+      # setup-miniconda: https://github.com/conda-incubator/setup-miniconda
+      # and tox-conda: https://github.com/tox-dev/tox-conda
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install setuptools tox tox-gh-actions
           python -m pip install napari_cellseg3d
 
-# this runs the platform-specific tests declared in tox.ini
+      # This runs the platform-specific tests declared in tox.ini
       - name: Test with tox
-        uses: GabrielBB/xvfb-action@v1 # aganders3/headless-gui@v1
+        uses: GabrielBB/xvfb-action@v1  # aganders3/headless-gui@v1
         with:
           run: python -m tox
         env:
@@ -65,31 +63,30 @@ jobs:
         uses: codecov/codecov-action@v2
 
   deploy:
-  # This will run when you have tagged a commit starting with "v*"
     needs: [test]
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     if: contains(github.ref, 'tags')
-    
+
     steps:
       - uses: actions/checkout@v2
-  
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: "3.8"  # Pin a specific version of Python (adjust if needed)
-  
+          python-version: "3.9"  # Specify Python 3.9
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -U setuptools setuptools_scm wheel twine build cibuildwheel
-  
+          pip install -U setuptools wheel twine build
+
       - name: Build and publish
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.TWINE_API_KEY }}
         run: |
-          # Build the package with cibuildwheel for compatibility with manylinux
-          cibuildwheel --output-dir dist --python "cp38,cp39"
-  
+          # Build the wheel for macOS and Python 3.9
+          python -m build --wheel --sdist .
+
           # Upload to PyPI using Twine
           twine upload dist/*
