@@ -11,7 +11,7 @@ pip install pydensecrf2
 import pydensecrf
 ```
 
-Then use the package as desribed below!
+Then use the package as described below!
 
 ## Please credit the original authors by citing:
 
