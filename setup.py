@@ -23,6 +23,7 @@ setup(
     name="pydensecrf2",
     version="1.1",
     description="A python interface to Philipp Krähenbühl's fully-connected (dense) CRF code.",
+    long_description_content_type="text/markdown",
     long_description=(Path(__file__).parent / "README.md").read_text(),
     author="Lucas Beyer, Philipp Krähenbühl",
     author_email="lucasb.eyer.be@gmail.com",
