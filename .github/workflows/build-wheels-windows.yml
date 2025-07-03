@@ -4,11 +4,8 @@
 name: Build wheels (Windows)
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  release:
+    types: [ published ]
 
 jobs:
   build_wheels:
@@ -25,24 +22,10 @@ jobs:
         output-dir: wheelhouse
       env:
         CIBW_BUILD: cp39-win_amd64 cp310-win_amd64 cp311-win_amd64 cp312-win_amd64
-    - name: Get version from git tag
-      id: get_version
-      shell: bash
-      run: |
-        if [ "$GITHUB_REF_TYPE" = "tag" ]; then
-          VERSION=${GITHUB_REF#refs/tags/}
-        else
-          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "latest-$(git rev-parse --short HEAD)")
-        fi
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-    - name: Create GitHub Release
-      if: github.ref_type == 'tag' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    - name: Upload wheels to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ github.ref_type == 'tag' && github.ref_name || steps.get_version.outputs.version }}
-        name: Release ${{ github.ref_type == 'tag' && github.ref_name || steps.get_version.outputs.version }}
-        draft: false
-        prerelease: ${{ github.ref_type != 'tag' }}
+        files: wheelhouse/*.whl
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload wheels to GitHub Release
