@@ -25,8 +25,25 @@ jobs:
         output-dir: wheelhouse
       env:
         CIBW_BUILD: cp39-win_amd64 cp310-win_amd64 cp311-win_amd64 cp312-win_amd64
-    - name: Upload wheels
+    - name: Upload wheels for each Python version
+      run: |
+        for whl in wheelhouse/*.whl
+        set whl_name (basename $whl)
+        echo "Uploading $whl_name"
+        gh release upload temp-release $whl --clobber || true
+        echo "::group::Upload $whl_name"
+        echo "::endgroup::"
+      shell: bash
+    - name: Upload wheels as separate artifacts
+      run: |
+        for whl in wheelhouse/*.whl; do
+          whl_name=$(basename "$whl" .whl)
+          echo "Uploading $whl as $whl_name"
+          mkdir -p artifacts/$whl_name
+          cp "$whl" artifacts/$whl_name/
+        done
+      shell: bash
+    - name: Upload all wheel artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: wheels
-        path: wheelhouse/*.whl
+        path: artifacts/*/*.whl
