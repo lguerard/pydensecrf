@@ -6,9 +6,9 @@ name: Build wheels (Windows)
 on:
   workflow_dispatch:
   push:
-    branches: [ main, master, test_ga_build ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ main, master, test_ga_build ]
+    branches: [ main, master ]
 
 jobs:
   build_wheels:
@@ -25,25 +25,28 @@ jobs:
         output-dir: wheelhouse
       env:
         CIBW_BUILD: cp39-win_amd64 cp310-win_amd64 cp311-win_amd64 cp312-win_amd64
-    - name: Upload wheels for each Python version
+    - name: Get version from git tag
+      id: get_version
       run: |
-        for whl in wheelhouse/*.whl
-        set whl_name (basename $whl)
-        echo "Uploading $whl_name"
-        gh release upload temp-release $whl --clobber || true
-        echo "::group::Upload $whl_name"
-        echo "::endgroup::"
-      shell: bash
-    - name: Upload wheels as separate artifacts
-      run: |
-        for whl in wheelhouse/*.whl; do
-          whl_name=$(basename "$whl" .whl)
-          echo "Uploading $whl as $whl_name"
-          mkdir -p artifacts/$whl_name
-          cp "$whl" artifacts/$whl_name/
-        done
-      shell: bash
-    - name: Upload all wheel artifacts
-      uses: actions/upload-artifact@v4
+        if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+          VERSION=${GITHUB_REF#refs/tags/}
+        else
+          VERSION=$(git describe --tags --abbrev=0)
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+    - name: Create GitHub Release
+      if: github.ref_type == 'tag' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: softprops/action-gh-release@v2
       with:
-        path: artifacts/*/*.whl
+        tag_name: ${{ steps.get_version.outputs.version }}
+        name: Release ${{ steps.get_version.outputs.version }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload wheels to GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: wheelhouse/*.whl
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
