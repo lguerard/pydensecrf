@@ -21,7 +21,7 @@ jobs:
       with:
         output-dir: wheelhouse
       env:
-        CIBW_BUILD: cp39-win_amd64 cp310-win_amd64 cp311-win_amd64 cp312-win_amd64
+        CIBW_BUILD: cp3*-win_amd64
     - name: Upload wheels to GitHub Release
       uses: softprops/action-gh-release@v2
       with:
